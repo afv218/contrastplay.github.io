@@ -1,0 +1,368 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+    <meta name="theme-color" content="#090A0C" />
+    <meta name="color-scheme" content="dark" />
+    <title>ContrastPlay</title>
+    <link rel="stylesheet" href="./styles.css" />
+  </head>
+  <body>
+    <div class="viewport no-print">
+      <!-- Subtle Floating Top Corners -->
+      <header class="hud-top">
+        <div class="brand" aria-label="ContrastPlay">
+          <span class="brand-mark" aria-hidden="true"></span>
+          <span class="brand-name">ContrastPlay</span>
+          <span id="seed-pill" class="seed-pill" title="Current pattern seed">STAR-482</span>
+        </div>
+
+        <div class="top-controls">
+          <button
+            id="btn-open-guide"
+            class="icon-btn"
+            type="button"
+            aria-label="How to Play and Benefits Guide"
+            title="How to Play"
+          >
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+              <circle cx="12" cy="12" r="10" />
+              <line x1="12" y1="16" x2="12" y2="12" />
+              <line x1="12" y1="8" x2="12.01" y2="8" />
+            </svg>
+            <span class="btn-label">Guide</span>
+          </button>
+
+          <button
+            id="btn-open-export"
+            class="icon-btn"
+            type="button"
+            aria-label="Export and Print Deck"
+            title="Export &amp; Print"
+          >
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+              <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+              <polyline points="7 10 12 15 17 10" />
+              <line x1="12" y1="15" x2="12" y2="3" />
+            </svg>
+            <span class="btn-label">Export</span>
+            <span id="deck-dot" class="deck-dot hidden" aria-hidden="true"></span>
+          </button>
+
+          <button
+            id="btn-open-options"
+            class="icon-btn"
+            type="button"
+            aria-label="Open Pattern Options"
+            aria-expanded="false"
+            aria-controls="options-drawer"
+            title="Options"
+          >
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+              <line x1="4" y1="6" x2="20" y2="6" />
+              <circle cx="9" cy="6" r="2" fill="currentColor" />
+              <line x1="4" y1="12" x2="20" y2="12" />
+              <circle cx="15" cy="12" r="2" fill="currentColor" />
+              <line x1="4" y1="18" x2="20" y2="18" />
+              <circle cx="10" cy="18" r="2" fill="currentColor" />
+            </svg>
+            <span class="btn-label">Options</span>
+          </button>
+        </div>
+      </header>
+
+      <!-- Full-Focus Pattern Stage -->
+      <main class="canvas-stage">
+        <div
+          id="card-preview"
+          class="card-preview"
+          role="button"
+          tabindex="0"
+          aria-label="High-contrast pattern. Double-tap or double-click for a new pattern."
+        ></div>
+        <div id="gesture-hint" class="gesture-hint" aria-hidden="true">
+          Double-tap pattern for new
+        </div>
+      </main>
+
+      <!-- Floating Right-Side Quick Controls -->
+      <nav class="quick-rail" aria-label="Quick pattern controls">
+        <button id="btn-quick-motion" class="quick-btn" type="button" title="Cycle motion (Off / Drift / Breathe / Spin)" aria-pressed="false">
+          <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <path d="M2 12c2.5-4 5.5-4 8 0s5.5 4 8 0 4-4 4-4" />
+          </svg>
+          <span id="quick-motion-label" class="quick-label">Motion</span>
+        </button>
+
+        <button id="btn-quick-invert" class="quick-btn" type="button" title="Invert Black &amp; White" aria-pressed="false">
+          <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <circle cx="12" cy="12" r="9" />
+            <path d="M12 3a9 9 0 0 0 0 18z" fill="currentColor" />
+          </svg>
+          <span class="quick-label">Invert</span>
+        </button>
+
+        <button id="btn-quick-frame" class="quick-btn active" type="button" title="Toggle Card Frame" aria-pressed="true">
+          <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <rect x="4" y="4" width="16" height="16" rx="2" />
+          </svg>
+          <span class="quick-label">Frame</span>
+        </button>
+      </nav>
+
+      <!-- Bottom-Center Play + Timer Control -->
+      <footer class="hud-bottom">
+        <div class="player-pill">
+          <button
+            id="btn-prev"
+            class="mini-btn"
+            type="button"
+            aria-label="Previous pattern"
+            title="Previous (←)"
+            disabled
+          >
+            ‹
+          </button>
+
+          <button
+            id="btn-play"
+            class="play-btn"
+            type="button"
+            aria-pressed="false"
+            title="Auto-cycle new patterns (Space)"
+          >
+            <span id="play-icon" class="play-icon" aria-hidden="true">▶</span>
+            <span id="play-label">Play</span>
+          </button>
+
+          <label class="timer-wrap" for="interval-slider" title="Seconds between pattern changes">
+            <input
+              id="interval-slider"
+              class="timer-slider"
+              type="range"
+              min="3"
+              max="30"
+              step="1"
+              value="10"
+              aria-label="Seconds between patterns"
+            />
+            <span id="interval-value" class="timer-value">10s</span>
+          </label>
+        </div>
+      </footer>
+    </div>
+
+    <!-- Backdrop for Drawers / Modals -->
+    <div id="backdrop" class="backdrop hidden no-print" aria-hidden="true"></div>
+
+    <!-- Expandable Options Drawer -->
+    <aside
+      id="options-drawer"
+      class="drawer hidden no-print"
+      role="dialog"
+      aria-modal="true"
+      aria-label="Pattern Options"
+    >
+      <div class="sheet-head">
+        <h2>Options</h2>
+        <button id="btn-close-options" class="close-btn" type="button" aria-label="Close options">✕</button>
+      </div>
+
+      <div class="sheet-body">
+        <section class="group">
+          <div class="group-head">
+            <h3>Seed</h3>
+            <button id="btn-new-seed" class="text-btn" type="button">↻ Random</button>
+          </div>
+          <div class="seed-row">
+            <input
+              id="seed-input"
+              class="seed-input"
+              type="text"
+              maxlength="24"
+              value="STAR-482"
+              placeholder="Type any word or number"
+              spellcheck="false"
+              autocomplete="off"
+            />
+          </div>
+        </section>
+
+        <section class="group">
+          <div class="group-head">
+            <h3>Style</h3>
+          </div>
+          <div id="family-grid" class="chip-grid" role="radiogroup" aria-label="Pattern style"></div>
+        </section>
+
+        <section class="group">
+          <div class="group-head">
+            <h3>Palette</h3>
+          </div>
+          <div id="palette-grid" class="palette-grid" role="radiogroup" aria-label="Color palette"></div>
+        </section>
+
+        <section class="group">
+          <div class="group-head">
+            <h3>Density</h3>
+            <span id="complexity-label" class="pill-note">3 · Balanced</span>
+          </div>
+          <div id="density-steps" class="density-steps" role="radiogroup" aria-label="Pattern density">
+            <button type="button" class="step-btn" data-level="1">1</button>
+            <button type="button" class="step-btn" data-level="2">2</button>
+            <button type="button" class="step-btn active" data-level="3">3</button>
+            <button type="button" class="step-btn" data-level="4">4</button>
+            <button type="button" class="step-btn" data-level="5">5</button>
+          </div>
+          <div class="density-caption">
+            <span>Simple</span>
+            <span>Detailed</span>
+          </div>
+        </section>
+
+        <section class="group">
+          <div class="group-head">
+            <h3>Motion</h3>
+          </div>
+          <div id="motion-grid" class="motion-grid" role="radiogroup" aria-label="Subtle pattern motion">
+            <button type="button" class="motion-btn active" data-motion="off" role="radio" aria-checked="true">Off</button>
+            <button type="button" class="motion-btn" data-motion="drift" role="radio" aria-checked="false">Gentle Drift</button>
+            <button type="button" class="motion-btn" data-motion="breathe" role="radio" aria-checked="false">Breathe</button>
+            <button type="button" class="motion-btn" data-motion="spin" role="radio" aria-checked="false">Slow Spin</button>
+          </div>
+        </section>
+
+        <section class="group switch-group">
+          <label class="switch-row">
+            <span>Invert Black / White</span>
+            <input id="toggle-invert" type="checkbox" />
+            <span class="switch-track" aria-hidden="true"></span>
+          </label>
+          <label class="switch-row">
+            <span>Card Frame</span>
+            <input id="toggle-border" type="checkbox" checked />
+            <span class="switch-track" aria-hidden="true"></span>
+          </label>
+        </section>
+
+        <section class="group">
+          <div class="group-head">
+            <h3>Fresh Seeds</h3>
+            <button id="btn-roll-feed" class="text-btn" type="button">↻ Roll 6</button>
+          </div>
+          <div id="discovery-grid" class="mini-gallery"></div>
+        </section>
+      </div>
+    </aside>
+
+    <!-- Export & Print Deck Modal -->
+    <section
+      id="export-modal"
+      class="modal hidden no-print"
+      role="dialog"
+      aria-modal="true"
+      aria-label="Export and Print Deck"
+    >
+      <div class="sheet-head">
+        <div>
+          <h2>Export &amp; Print</h2>
+          <p id="export-card-title" class="modal-sub">Truchet Ribbons · STAR-482</p>
+        </div>
+        <button id="btn-close-export" class="close-btn" type="button" aria-label="Close export menu">✕</button>
+      </div>
+
+      <div class="sheet-body">
+        <div class="export-actions">
+          <button id="btn-download-png" class="action-btn action-primary" type="button">
+            ⬇ Download PNG <small>300 DPI</small>
+          </button>
+          <button id="btn-download-svg" class="action-btn" type="button">
+            ⬇ Download SVG <small>Vector</small>
+          </button>
+          <button id="btn-copy-link" class="action-btn" type="button">
+            🔗 Copy Share Link
+          </button>
+          <button id="btn-add-deck" class="action-btn" type="button">
+            ＋ Save to Print Deck
+          </button>
+        </div>
+
+        <div class="deck-block">
+          <div class="group-head">
+            <h3>Print Deck <span id="deck-count" class="count-pill">4</span></h3>
+            <div class="inline-actions">
+              <button id="btn-deck-mix" class="text-btn" type="button">✦ 4 Fresh</button>
+              <button id="btn-deck-clear" class="text-btn" type="button">Clear</button>
+            </div>
+          </div>
+          <div id="deck-strip" class="deck-strip"></div>
+          <button id="btn-print" class="action-btn action-ink print-cta" type="button">
+            🖨 Print 2×2 Flashcard Sheet
+          </button>
+        </div>
+      </div>
+    </section>
+
+    <!-- How to Play & Benefits Guide Modal -->
+    <section
+      id="guide-modal"
+      class="modal hidden no-print"
+      role="dialog"
+      aria-modal="true"
+      aria-label="How to Use ContrastPlay"
+    >
+      <div class="sheet-head">
+        <div>
+          <h2>How to Use ContrastPlay</h2>
+          <p class="modal-sub">Gentle visual play for 0–6+ months</p>
+        </div>
+        <button id="btn-close-guide" class="close-btn" type="button" aria-label="Close guide">✕</button>
+      </div>
+
+      <div class="sheet-body guide-body">
+        <div class="guide-section">
+          <h3>Getting Started</h3>
+          <p>
+            Hold the screen or printed card about <strong>8–12 inches (20–30 cm)</strong> from your baby's eyes—right in a newborn's sharpest focus range. Pause on one pattern for 10–20 seconds so they can lock on, then <strong>double-tap</strong> for a new card or tap <strong>Play</strong> to cycle gently on a timer.
+          </p>
+        </div>
+
+        <div class="guide-section">
+          <h3>Eye Tracking with Motion</h3>
+          <p>
+            Tap <strong>Motion</strong> to add calm, predictable movement for visual pursuit practice:
+          </p>
+          <ul class="guide-list">
+            <li><strong>Gentle Drift</strong> — slow side-to-side glide that encourages smooth horizontal eye tracking across the midline.</li>
+            <li><strong>Breathe</strong> — soft rhythmic zoom that helps babies hold focus on bold edges.</li>
+            <li><strong>Slow Spin</strong> — unhurried rotation that turns mandalas and optical patterns into soothing circular tracking.</li>
+          </ul>
+        </div>
+
+        <div class="guide-section">
+          <h3>Why High Contrast Helps</h3>
+          <p>
+            In the first months, a baby's retina and visual pathways are developing rapidly. Stark <strong>black and white</strong> edges send the clearest signal to the brain, helping build visual focus, attention span, and optic nerve strength. Around <strong>2–4 months</strong>, babies begin distinguishing bold <strong>red</strong> clearly—making black, white, and red patterns great for tummy time and alert awake windows.
+          </p>
+          <p class="guide-tip">
+            Keep sessions short and calm (a few minutes at a time), and follow your baby's cues—wide eyes and stillness mean engaged, while turning away or yawning means it's time for a break.
+          </p>
+        </div>
+
+        <div class="guide-shortcuts">
+          <span><strong>Double-tap</strong> New card</span>
+          <span><strong>Space</strong> Play / Pause</span>
+          <span><strong>← / →</strong> Back / Next</span>
+        </div>
+      </div>
+    </section>
+
+    <!-- Print-only 2x2 Flashcard Sheets -->
+    <section id="print-sheets" class="print-sheets" aria-hidden="true"></section>
+
+    <div id="toast" class="toast hidden no-print" role="status" aria-live="polite"></div>
+
+    <script type="module" src="./app.js"></script>
+  </body>
+</html>
